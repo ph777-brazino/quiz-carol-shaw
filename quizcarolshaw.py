@@ -15,7 +15,7 @@ if "pagina" not in st.session_state:
     st.session_state.valor_segunda = 0
     st.session_state.total = 0
 
-# -------- PERGUNTAS (IGUAL AO SEU CÓDIGO) --------
+# -------- PERGUNTAS --------
 perguntas_facil = [
     ("Quem foi Carol Shaw?", ["Atriz","Programadora de jogos","Cantora","Jogadora profissional"], "b"),
     ("Carol Shaw trabalhou com o que?", ["Filmes","Videogames","Música","Moda"], "b"),
@@ -59,7 +59,7 @@ perguntas_dificil = [
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
 
-    opcao = st.radio("Escolha uma opção:", ["Iniciar jogo", "Ver regras"])
+    opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver regras"])
 
     if opcao == "Ver regras":
         if st.button("Mostrar regras"):
@@ -69,7 +69,7 @@ if st.session_state.pagina == "menu":
     else:
         st.session_state.nome = st.text_input("Digite seu nome:")
 
-        dificuldade = st.radio("Escolha a dificuldade:", ["Fácil", "Média", "Difícil"])
+        dificuldade = st.radio("Dificuldade:", ["Fácil", "Média", "Difícil"])
 
         if st.button("Começar"):
             if dificuldade == "Fácil":
@@ -95,8 +95,8 @@ if st.session_state.pagina == "menu":
 elif st.session_state.pagina == "regras":
     st.title("📜 Regras")
     st.write("- Você terá 2 chances por pergunta")
-    st.write("- Responda com a, b, c ou d")
     st.write("- Acertar de primeira vale mais pontos")
+    st.write("- Segunda tentativa vale menos pontos")
 
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
@@ -115,6 +115,12 @@ elif st.session_state.pagina == "quiz":
         st.subheader(f"Pergunta {i+1}")
         st.write(pergunta)
 
+        st.info(
+            f"💰 Pontuação:\n"
+            f"- Primeira tentativa: {st.session_state.valor_principal} pontos\n"
+            f"- Segunda tentativa: {st.session_state.valor_segunda} pontos"
+        )
+
         resposta = st.radio(
             "Escolha:",
             ["a", "b", "c", "d"],
@@ -124,10 +130,10 @@ elif st.session_state.pagina == "quiz":
         if st.button("Próxima"):
             if resposta == correta:
                 if st.session_state.tentativa == 1:
-                    st.success("✔ Acertou de primeira!")
+                    st.success(f"✔ Acertou! (+{st.session_state.valor_principal} pontos)")
                     st.session_state.pontuacao += st.session_state.valor_principal
                 else:
-                    st.success("✔ Acertou na segunda tentativa!")
+                    st.success(f"✔ Acertou na segunda tentativa! (+{st.session_state.valor_segunda} pontos)")
                     st.session_state.pontuacao += st.session_state.valor_segunda
 
                 st.session_state.tentativa = 1
@@ -136,7 +142,11 @@ elif st.session_state.pagina == "quiz":
             else:
                 if st.session_state.tentativa == 1:
                     st.session_state.tentativa = 2
-                    st.error("❌ Você errou! Agora você está na SEGUNDA CHANCE.")
+                    st.error(
+                        f"❌ Você errou!\n\n"
+                        f"⚠️ Agora você está na SEGUNDA tentativa.\n"
+                        f"👉 Esta pergunta agora vale apenas {st.session_state.valor_segunda} pontos."
+                    )
                 else:
                     st.error("❌ Errou novamente! Pergunta encerrada.")
                     st.session_state.erros += 1
