@@ -4,7 +4,8 @@ st.set_page_config(page_title="Quiz Carol Shaw")
 
 # -------- ESTADO --------
 if "pagina" not in st.session_state:
-    st.session_state.pagina = "inicio"
+    st.session_state.pagina = "menu"
+    st.session_state.nome = ""
     st.session_state.pergunta_atual = 0
     st.session_state.pontuacao = 0
     st.session_state.erros = 0
@@ -14,7 +15,7 @@ if "pagina" not in st.session_state:
     st.session_state.valor_segunda = 0
     st.session_state.total = 0
 
-# -------- PERGUNTAS --------
+# -------- PERGUNTAS (IGUAL AO SEU CÓDIGO) --------
 perguntas_facil = [
     ("Quem foi Carol Shaw?", ["Atriz","Programadora de jogos","Cantora","Jogadora profissional"], "b"),
     ("Carol Shaw trabalhou com o que?", ["Filmes","Videogames","Música","Moda"], "b"),
@@ -54,36 +55,59 @@ perguntas_dificil = [
     ("River Raid foi famoso por:", ["Jogabilidade inovadora","Multiplayer online","Realismo gráfico","Efeitos sonoros"], "a"),
 ]
 
-# -------- TELA INICIAL --------
-if st.session_state.pagina == "inicio":
+# -------- MENU --------
+if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
 
-    dificuldade = st.radio("Escolha a dificuldade:", ["Fácil", "Média", "Difícil"])
+    opcao = st.radio("Escolha uma opção:", ["Iniciar jogo", "Ver regras"])
 
-    if st.button("Iniciar Quiz"):
-        if dificuldade == "Fácil":
-            st.session_state.perguntas = perguntas_facil
-            st.session_state.valor_principal = 10
-            st.session_state.valor_segunda = 5
-            st.session_state.total = 100
-        elif dificuldade == "Média":
-            st.session_state.perguntas = perguntas_media
-            st.session_state.valor_principal = 20
-            st.session_state.valor_segunda = 10
-            st.session_state.total = 200
-        else:
-            st.session_state.perguntas = perguntas_dificil
-            st.session_state.valor_principal = 30
-            st.session_state.valor_segunda = 15
-            st.session_state.total = 300
+    if opcao == "Ver regras":
+        if st.button("Mostrar regras"):
+            st.session_state.pagina = "regras"
+            st.rerun()
 
-        st.session_state.pagina = "quiz"
+    else:
+        st.session_state.nome = st.text_input("Digite seu nome:")
+
+        dificuldade = st.radio("Escolha a dificuldade:", ["Fácil", "Média", "Difícil"])
+
+        if st.button("Começar"):
+            if dificuldade == "Fácil":
+                st.session_state.perguntas = perguntas_facil
+                st.session_state.valor_principal = 10
+                st.session_state.valor_segunda = 5
+                st.session_state.total = 100
+            elif dificuldade == "Média":
+                st.session_state.perguntas = perguntas_media
+                st.session_state.valor_principal = 20
+                st.session_state.valor_segunda = 10
+                st.session_state.total = 200
+            else:
+                st.session_state.perguntas = perguntas_dificil
+                st.session_state.valor_principal = 30
+                st.session_state.valor_segunda = 15
+                st.session_state.total = 300
+
+            st.session_state.pagina = "quiz"
+            st.rerun()
+
+# -------- REGRAS --------
+elif st.session_state.pagina == "regras":
+    st.title("📜 Regras")
+    st.write("- Você terá 2 chances por pergunta")
+    st.write("- Responda com a, b, c ou d")
+    st.write("- Acertar de primeira vale mais pontos")
+
+    if st.button("Voltar"):
+        st.session_state.pagina = "menu"
         st.rerun()
 
 # -------- QUIZ --------
 elif st.session_state.pagina == "quiz":
     perguntas = st.session_state.perguntas
     i = st.session_state.pergunta_atual
+
+    st.write(f"👤 Jogador: {st.session_state.nome}")
 
     if i < len(perguntas):
         pergunta, opcoes, correta = perguntas[i]
@@ -100,8 +124,10 @@ elif st.session_state.pagina == "quiz":
         if st.button("Próxima"):
             if resposta == correta:
                 if st.session_state.tentativa == 1:
+                    st.success("✔ Acertou de primeira!")
                     st.session_state.pontuacao += st.session_state.valor_principal
                 else:
+                    st.success("✔ Acertou na segunda tentativa!")
                     st.session_state.pontuacao += st.session_state.valor_segunda
 
                 st.session_state.tentativa = 1
@@ -110,8 +136,9 @@ elif st.session_state.pagina == "quiz":
             else:
                 if st.session_state.tentativa == 1:
                     st.session_state.tentativa = 2
-                    st.warning("Errou! Segunda chance.")
+                    st.error("❌ Você errou! Agora você está na SEGUNDA CHANCE.")
                 else:
+                    st.error("❌ Errou novamente! Pergunta encerrada.")
                     st.session_state.erros += 1
                     st.session_state.tentativa = 1
                     st.session_state.pergunta_atual += 1
@@ -125,6 +152,7 @@ elif st.session_state.pagina == "quiz":
 elif st.session_state.pagina == "resultado":
     st.title("🏁 Resultado Final")
 
+    st.write(f"👤 Jogador: {st.session_state.nome}")
     st.write(f"Pontuação: {st.session_state.pontuacao} / {st.session_state.total}")
     st.write(f"Erros: {st.session_state.erros}")
 
@@ -135,7 +163,7 @@ elif st.session_state.pagina == "resultado":
     elif percentual >= 0.4:
         st.info("👍 Bom! Você conhece bastante!")
     else:
-        st.warning("📚 Continue estudando!")
+        st.warning("📚 Continue estudando sobre Carol Shaw!")
 
     if st.button("Reiniciar"):
         for k in list(st.session_state.keys()):
