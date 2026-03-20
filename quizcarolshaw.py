@@ -14,7 +14,7 @@ if "pagina" not in st.session_state:
     st.session_state.valor_principal = 0
     st.session_state.valor_segunda = 0
     st.session_state.total = 0
-    st.session_state.mostrar_resposta = False  # NOVO: flag para mostrar resposta após segunda tentativa
+    st.session_state.mostrar_resposta = False  # Flag para mostrar resposta após segunda tentativa
 
 # -------- PERGUNTAS --------
 perguntas_facil = [
@@ -59,11 +59,11 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
-    opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver informações"])
+    opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações"])
 
     if opcao == "Informações":
-        if st.button("Mostrar Informações"):
-            st.session_state.pagina = "Informações"
+        if st.button("Mostrar informações"):
+            st.session_state.pagina = "informações"
             st.rerun()
     else:
         st.session_state.nome = st.text_input("Digite seu nome:")
@@ -89,9 +89,9 @@ if st.session_state.pagina == "menu":
             st.session_state.pagina = "quiz"
             st.rerun()
 
-# -------- REGRAS --------
+# -------- INFORMAÇÕES --------
 elif st.session_state.pagina == "informações":
-    st.title("📜 informações")
+    st.title("📜 Informações")
     st.write("- Você terá 2 chances por pergunta")
     st.write("- Acertar de primeira vale mais pontos")
     st.write("- Segunda tentativa vale menos pontos")
@@ -111,14 +111,12 @@ elif st.session_state.pagina == "quiz":
         st.subheader(f"Pergunta {i+1}")
 
         if st.session_state.mostrar_resposta:
-            # Mostrar resposta correta após segunda tentativa errada
             st.error(f"A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
             if st.button("Próxima pergunta"):
                 st.session_state.mostrar_resposta = False
                 st.session_state.pergunta_atual += 1
                 st.rerun()
         else:
-            # Mostrar tentativa atual
             if st.session_state.tentativa == 1:
                 st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
             else:
@@ -152,7 +150,7 @@ elif st.session_state.pagina == "quiz":
                     else:
                         st.session_state.erros += 1
                         st.session_state.tentativa = 1
-                        st.session_state.mostrar_resposta = True  # Flag para mostrar resposta antes de avançar
+                        st.session_state.mostrar_resposta = True
 
     else:
         st.session_state.pagina = "resultado"
