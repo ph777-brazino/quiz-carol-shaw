@@ -58,20 +58,17 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
-
     opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver regras"])
 
     if opcao == "Ver regras":
         if st.button("Mostrar regras"):
             st.session_state.pagina = "regras"
             st.rerun()
-
     else:
         st.session_state.nome = st.text_input("Digite seu nome:")
-
         dificuldade = st.radio("Dificuldade:", ["Fácil", "Média", "Difícil"])
 
-        if st.button("Começar"):
+        if st.button("Começar") and st.session_state.nome.strip() != "":
             if dificuldade == "Fácil":
                 st.session_state.perguntas = perguntas_facil
                 st.session_state.valor_principal = 10
@@ -97,7 +94,6 @@ elif st.session_state.pagina == "regras":
     st.write("- Você terá 2 chances por pergunta")
     st.write("- Acertar de primeira vale mais pontos")
     st.write("- Segunda tentativa vale menos pontos")
-
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
         st.rerun()
@@ -111,26 +107,28 @@ elif st.session_state.pagina == "quiz":
 
     if i < len(perguntas):
         pergunta, opcoes, correta = perguntas[i]
-
         st.subheader(f"Pergunta {i+1}")
-        st.write(pergunta)
 
-        st.info(
-            f"💰 Pontuação:\n"
-            f"- Primeira tentativa: {st.session_state.valor_principal} pontos\n"
-            f"- Segunda tentativa: {st.session_state.valor_segunda} pontos"
-        )
+        # Mostra tentativa atual
+        if st.session_state.tentativa == 1:
+            st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
+        else:
+            st.warning(f"⚠️ Tentativa 2 de 2 — agora vale apenas {st.session_state.valor_segunda} pontos")
+
+        st.write(pergunta)
 
         resposta = st.radio(
             "Escolha:",
-            ["a", "b", "c", "d"],
-            format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}"
+            ["a","b","c","d"],
+            format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}",
+            key=f"resposta_{i}_{st.session_state.tentativa}"
         )
 
-        if st.button("Próxima"):
+        if st.button("Responder"):
             if resposta == correta:
+                # Acertou
                 if st.session_state.tentativa == 1:
-                    st.success(f"✔ Acertou! (+{st.session_state.valor_principal} pontos)")
+                    st.success(f"✔ Acertou de primeira! (+{st.session_state.valor_principal} pontos)")
                     st.session_state.pontuacao += st.session_state.valor_principal
                 else:
                     st.success(f"✔ Acertou na segunda tentativa! (+{st.session_state.valor_segunda} pontos)")
@@ -138,22 +136,19 @@ elif st.session_state.pagina == "quiz":
 
                 st.session_state.tentativa = 1
                 st.session_state.pergunta_atual += 1
-
+                st.rerun()
             else:
+                # Errou
                 if st.session_state.tentativa == 1:
                     st.session_state.tentativa = 2
-                    st.error(
-                        f"❌ Você errou!\n\n"
-                        f"⚠️ Agora você está na SEGUNDA tentativa.\n"
-                        f"👉 Esta pergunta agora vale apenas {st.session_state.valor_segunda} pontos."
-                    )
+                    st.error(f"❌ Errou! Segunda tentativa liberada — agora vale apenas {st.session_state.valor_segunda} pontos.")
+                    # NÃO avança a pergunta
                 else:
-                    st.error("❌ Errou novamente! Pergunta encerrada.")
+                    st.error("❌ Errou de novo! Pergunta encerrada.")
                     st.session_state.erros += 1
                     st.session_state.tentativa = 1
                     st.session_state.pergunta_atual += 1
-
-            st.rerun()
+                    st.rerun()
     else:
         st.session_state.pagina = "resultado"
         st.rerun()
@@ -161,13 +156,11 @@ elif st.session_state.pagina == "quiz":
 # -------- RESULTADO --------
 elif st.session_state.pagina == "resultado":
     st.title("🏁 Resultado Final")
-
     st.write(f"👤 Jogador: {st.session_state.nome}")
     st.write(f"Pontuação: {st.session_state.pontuacao} / {st.session_state.total}")
     st.write(f"Erros: {st.session_state.erros}")
 
     percentual = st.session_state.pontuacao / st.session_state.total
-
     if percentual >= 0.7:
         st.success("🔥 Excelente! Mestre em Carol Shaw!")
     elif percentual >= 0.4:
