@@ -109,7 +109,6 @@ elif st.session_state.pagina == "quiz":
         pergunta, opcoes, correta = perguntas[i]
         st.subheader(f"Pergunta {i+1}")
 
-        # Mostra tentativa atual
         if st.session_state.tentativa == 1:
             st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
         else:
@@ -126,7 +125,6 @@ elif st.session_state.pagina == "quiz":
 
         if st.button("Responder"):
             if resposta == correta:
-                # Acertou
                 if st.session_state.tentativa == 1:
                     st.success(f"✔ Acertou de primeira! (+{st.session_state.valor_principal} pontos)")
                     st.session_state.pontuacao += st.session_state.valor_principal
@@ -138,16 +136,15 @@ elif st.session_state.pagina == "quiz":
                 st.session_state.pergunta_atual += 1
                 st.rerun()
             else:
-                # Errou
                 if st.session_state.tentativa == 1:
                     st.session_state.tentativa = 2
                     st.error(f"❌ Errou! Segunda tentativa liberada — agora vale apenas {st.session_state.valor_segunda} pontos.")
-                    # NÃO avança a pergunta
                 else:
-                    st.error("❌ Errou de novo! Pergunta encerrada.")
+                    st.error(f"❌ Errou de novo! A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
                     st.session_state.erros += 1
                     st.session_state.tentativa = 1
                     st.session_state.pergunta_atual += 1
+                    st.button("Próxima pergunta")
                     st.rerun()
     else:
         st.session_state.pagina = "resultado"
