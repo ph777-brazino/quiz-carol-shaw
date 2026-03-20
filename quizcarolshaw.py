@@ -61,9 +61,9 @@ if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
     opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver regras"])
 
-    if opcao == "Ver regras":
-        if st.button("Mostrar regras"):
-            st.session_state.pagina = "regras"
+    if opcao == "Informações":
+        if st.button("Mostrar Informações"):
+            st.session_state.pagina = "Informações"
             st.rerun()
     else:
         st.session_state.nome = st.text_input("Digite seu nome:")
