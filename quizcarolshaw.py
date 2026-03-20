@@ -14,6 +14,7 @@ if "pagina" not in st.session_state:
     st.session_state.valor_principal = 0
     st.session_state.valor_segunda = 0
     st.session_state.total = 0
+    st.session_state.mostrar_resposta = False  # NOVO: flag para mostrar resposta após segunda tentativa
 
 # -------- PERGUNTAS --------
 perguntas_facil = [
@@ -109,43 +110,50 @@ elif st.session_state.pagina == "quiz":
         pergunta, opcoes, correta = perguntas[i]
         st.subheader(f"Pergunta {i+1}")
 
-        if st.session_state.tentativa == 1:
-            st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
-        else:
-            st.warning(f"⚠️ Tentativa 2 de 2 — agora vale apenas {st.session_state.valor_segunda} pontos")
-
-        st.write(pergunta)
-
-        resposta = st.radio(
-            "Escolha:",
-            ["a","b","c","d"],
-            format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}",
-            key=f"resposta_{i}_{st.session_state.tentativa}"
-        )
-
-        if st.button("Responder"):
-            if resposta == correta:
-                if st.session_state.tentativa == 1:
-                    st.success(f"✔ Acertou de primeira! (+{st.session_state.valor_principal} pontos)")
-                    st.session_state.pontuacao += st.session_state.valor_principal
-                else:
-                    st.success(f"✔ Acertou na segunda tentativa! (+{st.session_state.valor_segunda} pontos)")
-                    st.session_state.pontuacao += st.session_state.valor_segunda
-
-                st.session_state.tentativa = 1
+        if st.session_state.mostrar_resposta:
+            # Mostrar resposta correta após segunda tentativa errada
+            st.error(f"A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
+            if st.button("Próxima pergunta"):
+                st.session_state.mostrar_resposta = False
                 st.session_state.pergunta_atual += 1
                 st.rerun()
+        else:
+            # Mostrar tentativa atual
+            if st.session_state.tentativa == 1:
+                st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
             else:
-                if st.session_state.tentativa == 1:
-                    st.session_state.tentativa = 2
-                    st.error(f"❌ Errou! Segunda tentativa liberada — agora vale apenas {st.session_state.valor_segunda} pontos.")
-                else:
-                    st.error(f"❌ Errou de novo! A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
-                    st.session_state.erros += 1
+                st.warning(f"⚠️ Tentativa 2 de 2 — agora vale apenas {st.session_state.valor_segunda} pontos")
+
+            st.write(pergunta)
+
+            resposta = st.radio(
+                "Escolha:",
+                ["a","b","c","d"],
+                format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}",
+                key=f"resposta_{i}_{st.session_state.tentativa}"
+            )
+
+            if st.button("Responder"):
+                if resposta == correta:
+                    if st.session_state.tentativa == 1:
+                        st.success(f"✔ Acertou de primeira! (+{st.session_state.valor_principal} pontos)")
+                        st.session_state.pontuacao += st.session_state.valor_principal
+                    else:
+                        st.success(f"✔ Acertou na segunda tentativa! (+{st.session_state.valor_segunda} pontos)")
+                        st.session_state.pontuacao += st.session_state.valor_segunda
+
                     st.session_state.tentativa = 1
                     st.session_state.pergunta_atual += 1
-                    st.button("Próxima pergunta")
                     st.rerun()
+                else:
+                    if st.session_state.tentativa == 1:
+                        st.session_state.tentativa = 2
+                        st.error(f"❌ Errou! Segunda tentativa liberada — agora vale apenas {st.session_state.valor_segunda} pontos.")
+                    else:
+                        st.session_state.erros += 1
+                        st.session_state.tentativa = 1
+                        st.session_state.mostrar_resposta = True  # Flag para mostrar resposta antes de avançar
+
     else:
         st.session_state.pagina = "resultado"
         st.rerun()
