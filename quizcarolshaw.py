@@ -59,7 +59,7 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
-    opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver regras"])
+    opcao = st.radio("Escolha:", ["Iniciar jogo", "Ver informações"])
 
     if opcao == "Informações":
         if st.button("Mostrar Informações"):
