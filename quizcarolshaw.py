@@ -90,8 +90,8 @@ if st.session_state.pagina == "menu":
             st.rerun()
 
 # -------- REGRAS --------
-elif st.session_state.pagina == "regras":
-    st.title("📜 Regras")
+elif st.session_state.pagina == "informações":
+    st.title("📜 informações")
     st.write("- Você terá 2 chances por pergunta")
     st.write("- Acertar de primeira vale mais pontos")
     st.write("- Segunda tentativa vale menos pontos")
