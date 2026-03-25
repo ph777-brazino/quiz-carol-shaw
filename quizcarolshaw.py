@@ -59,15 +59,15 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
-    opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações do Quiz", "Homenageada"])
+    opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações do Quiz", "Informações sobre Carol Shaw"])
 
     if opcao == "Informações do Quiz":
         if st.button("Mostrar informações"):
             st.session_state.pagina = "informações"
             st.rerun()
 
-    elif opcao == "Homenageada":
-        if st.button("Ver homenagem"):
+    elif opcao == "Informações sobre Carol Shaw":
+        if st.button("Ver informações"):
             st.session_state.pagina = "homenageada"
             st.rerun()
 
@@ -105,9 +105,9 @@ elif st.session_state.pagina == "informações":
         st.session_state.pagina = "menu"
         st.rerun()
 
-# -------- HOMENAGEADA --------
+# -------- INFORMAÇÕES SOBRE CAROL SHAW --------
 elif st.session_state.pagina == "homenageada":
-    st.title("👩‍💻 Homenageada: Carol Shaw")
+    st.title("👩‍💻 Informações sobre Carol Shaw")
 
     st.write("""
 Carol Shaw nasceu em 1955 e, desde jovem, demonstrava interesse por tecnologia, algo incomum para mulheres na época. Mesmo enfrentando desafios por estar em um ambiente dominado por homens, decidiu seguir nessa área.
@@ -119,81 +119,4 @@ Além de suas contribuições técnicas, Carol Shaw se tornou uma pioneira, mesm
 
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
-        st.rerun()
-
-# -------- QUIZ --------
-elif st.session_state.pagina == "quiz":
-    perguntas = st.session_state.perguntas
-    i = st.session_state.pergunta_atual
-
-    st.write(f"👤 Jogador: {st.session_state.nome}")
-
-    if i < len(perguntas):
-        pergunta, opcoes, correta = perguntas[i]
-        st.subheader(f"Pergunta {i+1}")
-
-        if st.session_state.mostrar_resposta:
-            st.error(f"A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
-            if st.button("Próxima pergunta"):
-                st.session_state.mostrar_resposta = False
-                st.session_state.pergunta_atual += 1
-                st.rerun()
-        else:
-            if st.session_state.tentativa == 1:
-                st.info(f"🎯 Tentativa 1 de 2 — vale {st.session_state.valor_principal} pontos")
-            else:
-                st.warning(f"⚠️ Tentativa 2 de 2 — agora vale apenas {st.session_state.valor_segunda} pontos")
-
-            st.write(pergunta)
-
-            resposta = st.radio(
-                "Escolha:",
-                ["a","b","c","d"],
-                format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}",
-                key=f"resposta_{i}_{st.session_state.tentativa}"
-            )
-
-            if st.button("Responder"):
-                if resposta == correta:
-                    if st.session_state.tentativa == 1:
-                        st.success(f"✔ Acertou de primeira! (+{st.session_state.valor_principal} pontos)")
-                        st.session_state.pontuacao += st.session_state.valor_principal
-                    else:
-                        st.success(f"✔ Acertou na segunda tentativa! (+{st.session_state.valor_segunda} pontos)")
-                        st.session_state.pontuacao += st.session_state.valor_segunda
-
-                    st.session_state.tentativa = 1
-                    st.session_state.pergunta_atual += 1
-                    st.rerun()
-                else:
-                    if st.session_state.tentativa == 1:
-                        st.session_state.tentativa = 2
-                        st.error(f"❌ Errou! Segunda tentativa liberada — agora vale apenas {st.session_state.valor_segunda} pontos.")
-                    else:
-                        st.session_state.erros += 1
-                        st.session_state.tentativa = 1
-                        st.session_state.mostrar_resposta = True
-
-    else:
-        st.session_state.pagina = "resultado"
-        st.rerun()
-
-# -------- RESULTADO --------
-elif st.session_state.pagina == "resultado":
-    st.title("🏁 Resultado Final")
-    st.write(f"👤 Jogador: {st.session_state.nome}")
-    st.write(f"Pontuação: {st.session_state.pontuacao} / {st.session_state.total}")
-    st.write(f"Erros: {st.session_state.erros}")
-
-    percentual = st.session_state.pontuacao / st.session_state.total
-    if percentual >= 0.7:
-        st.success("🔥 Excelente! Mestre em Carol Shaw!")
-    elif percentual >= 0.4:
-        st.info("👍 Bom! Você conhece bastante!")
-    else:
-        st.warning("📚 Continue estudando sobre Carol Shaw!")
-
-    if st.button("Reiniciar"):
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
         st.rerun()
