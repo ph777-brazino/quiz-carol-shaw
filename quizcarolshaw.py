@@ -14,7 +14,7 @@ if "pagina" not in st.session_state:
     st.session_state.valor_principal = 0
     st.session_state.valor_segunda = 0
     st.session_state.total = 0
-    st.session_state.mostrar_resposta = False  # Flag para mostrar resposta após segunda tentativa
+    st.session_state.mostrar_resposta = False
 
 # -------- PERGUNTAS --------
 perguntas_facil = [
@@ -59,12 +59,18 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
-    opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações"])
+    opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações do Quiz", "Homenageada"])
 
-    if opcao == "Informações":
+    if opcao == "Informações do Quiz":
         if st.button("Mostrar informações"):
             st.session_state.pagina = "informações"
             st.rerun()
+
+    elif opcao == "Homenageada":
+        if st.button("Ver homenagem"):
+            st.session_state.pagina = "homenageada"
+            st.rerun()
+
     else:
         st.session_state.nome = st.text_input("Digite seu nome:")
         dificuldade = st.radio("Dificuldade:", ["Fácil", "Média", "Difícil"])
@@ -89,12 +95,28 @@ if st.session_state.pagina == "menu":
             st.session_state.pagina = "quiz"
             st.rerun()
 
-# -------- INFORMAÇÕES --------
+# -------- INFORMAÇÕES DO QUIZ --------
 elif st.session_state.pagina == "informações":
-    st.title("📜 Informações")
+    st.title("📜 Informações do Quiz")
     st.write("- Você terá 2 chances por pergunta")
     st.write("- Acertar de primeira vale mais pontos")
     st.write("- Segunda tentativa vale menos pontos")
+    if st.button("Voltar"):
+        st.session_state.pagina = "menu"
+        st.rerun()
+
+# -------- HOMENAGEADA --------
+elif st.session_state.pagina == "homenageada":
+    st.title("👩‍💻 Homenageada: Carol Shaw")
+
+    st.write("""
+Carol Shaw nasceu em 1955 e, desde jovem, demonstrava interesse por tecnologia, algo incomum para mulheres na época. Mesmo enfrentando desafios por estar em um ambiente dominado por homens, decidiu seguir nessa área.
+
+Iniciou sua carreira na Atari, onde já mostrava seu talento na criação de jogos. Mais tarde, na Activision, ganhou destaque ao desenvolver o jogo River Raid, que fez grande sucesso e marcou a história dos videogames.
+
+Além de suas contribuições técnicas, Carol Shaw se tornou uma pioneira, mesmo se aposentando cedo, ela abriu caminhos para a participação feminina na tecnologia e inspirando diversas pessoas com sua trajetória.
+""")
+
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
         st.rerun()
