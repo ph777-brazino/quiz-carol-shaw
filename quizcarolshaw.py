@@ -5,16 +5,37 @@ st.set_page_config(page_title="Quiz Carol Shaw")
 # -------- ESTADO --------
 if "pagina" not in st.session_state:
     st.session_state.pagina = "menu"
+
+if "nome" not in st.session_state:
     st.session_state.nome = ""
+
+if "pergunta_atual" not in st.session_state:
     st.session_state.pergunta_atual = 0
+
+if "pontuacao" not in st.session_state:
     st.session_state.pontuacao = 0
+
+if "erros" not in st.session_state:
     st.session_state.erros = 0
+
+if "tentativa" not in st.session_state:
     st.session_state.tentativa = 1
+
+if "perguntas" not in st.session_state:
     st.session_state.perguntas = []
+
+if "valor_principal" not in st.session_state:
     st.session_state.valor_principal = 0
+
+if "valor_segunda" not in st.session_state:
     st.session_state.valor_segunda = 0
+
+if "total" not in st.session_state:
     st.session_state.total = 0
+
+if "mostrar_resposta" not in st.session_state:
     st.session_state.mostrar_resposta = False
+
 
 # -------- PERGUNTAS --------
 perguntas_facil = [
@@ -59,6 +80,7 @@ perguntas_dificil = [
 # -------- MENU --------
 if st.session_state.pagina == "menu":
     st.title("🎮 Quiz Carol Shaw")
+
     opcao = st.radio("Escolha:", ["Iniciar jogo", "Informações do Quiz", "Informações sobre Carol Shaw"])
 
     if opcao == "Informações do Quiz":
@@ -72,40 +94,53 @@ if st.session_state.pagina == "menu":
             st.rerun()
 
     else:
-        st.session_state.nome = st.text_input("Digite seu nome:")
+        nome = st.text_input("Digite seu nome:")
         dificuldade = st.radio("Dificuldade:", ["Fácil", "Média", "Difícil"])
 
-        if st.button("Começar") and st.session_state.nome.strip() != "":
-            if dificuldade == "Fácil":
-                st.session_state.perguntas = perguntas_facil
-                st.session_state.valor_principal = 10
-                st.session_state.valor_segunda = 5
-                st.session_state.total = 100
-            elif dificuldade == "Média":
-                st.session_state.perguntas = perguntas_media
-                st.session_state.valor_principal = 20
-                st.session_state.valor_segunda = 10
-                st.session_state.total = 200
+        if st.button("Começar"):
+            if nome.strip() == "":
+                st.warning("Digite seu nome para começar!")
             else:
-                st.session_state.perguntas = perguntas_dificil
-                st.session_state.valor_principal = 30
-                st.session_state.valor_segunda = 15
-                st.session_state.total = 300
+                st.session_state.nome = nome
 
-            st.session_state.pagina = "quiz"
-            st.rerun()
+                # RESET DO JOGO (CORREÇÃO PRINCIPAL)
+                st.session_state.pergunta_atual = 0
+                st.session_state.pontuacao = 0
+                st.session_state.erros = 0
+                st.session_state.tentativa = 1
+                st.session_state.mostrar_resposta = False
 
-# -------- INFORMAÇÕES DO QUIZ --------
+                if dificuldade == "Fácil":
+                    st.session_state.perguntas = perguntas_facil
+                    st.session_state.valor_principal = 10
+                    st.session_state.valor_segunda = 5
+                    st.session_state.total = 100
+                elif dificuldade == "Média":
+                    st.session_state.perguntas = perguntas_media
+                    st.session_state.valor_principal = 20
+                    st.session_state.valor_segunda = 10
+                    st.session_state.total = 200
+                else:
+                    st.session_state.perguntas = perguntas_dificil
+                    st.session_state.valor_principal = 30
+                    st.session_state.valor_segunda = 15
+                    st.session_state.total = 300
+
+                st.session_state.pagina = "quiz"
+                st.rerun()
+
+# -------- INFORMAÇÕES --------
 elif st.session_state.pagina == "informações":
     st.title("📜 Informações do Quiz")
     st.write("- Você terá 2 chances por pergunta")
     st.write("- Acertar de primeira vale mais pontos")
     st.write("- Segunda tentativa vale menos pontos")
+
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
         st.rerun()
 
-# -------- INFORMAÇÕES SOBRE CAROL SHAW --------
+# -------- HOMENAGEADA --------
 elif st.session_state.pagina == "homenageada":
     st.title("👩‍💻 Informações sobre Carol Shaw")
 
@@ -119,4 +154,71 @@ Além de suas contribuições técnicas, Carol Shaw se tornou uma pioneira, mesm
 
     if st.button("Voltar"):
         st.session_state.pagina = "menu"
+        st.rerun()
+
+# -------- QUIZ --------
+elif st.session_state.pagina == "quiz":
+    perguntas = st.session_state.perguntas
+    i = st.session_state.pergunta_atual
+
+    st.write(f"👤 Jogador: {st.session_state.nome}")
+
+    if i < len(perguntas):
+        pergunta, opcoes, correta = perguntas[i]
+
+        st.subheader(f"Pergunta {i+1}")
+        st.write(pergunta)
+
+        if st.session_state.mostrar_resposta:
+            st.error(f"A resposta correta era: {correta}) {opcoes[ord(correta)-97]}")
+            if st.button("Próxima pergunta"):
+                st.session_state.mostrar_resposta = False
+                st.session_state.pergunta_atual += 1
+                st.rerun()
+        else:
+            if st.session_state.tentativa == 1:
+                st.info(f"🎯 Tentativa 1 — vale {st.session_state.valor_principal} pontos")
+            else:
+                st.warning(f"⚠️ Tentativa 2 — vale {st.session_state.valor_segunda} pontos")
+
+            resposta = st.radio(
+                "Escolha:",
+                ["a","b","c","d"],
+                format_func=lambda x: f"{x}) {opcoes[ord(x)-97]}",
+                key=f"resposta_{i}_{st.session_state.tentativa}"
+            )
+
+            if st.button("Responder"):
+                if resposta == correta:
+                    if st.session_state.tentativa == 1:
+                        st.session_state.pontuacao += st.session_state.valor_principal
+                    else:
+                        st.session_state.pontuacao += st.session_state.valor_segunda
+
+                    st.session_state.tentativa = 1
+                    st.session_state.pergunta_atual += 1
+                    st.rerun()
+                else:
+                    if st.session_state.tentativa == 1:
+                        st.session_state.tentativa = 2
+                        st.error("❌ Errou! Tente novamente.")
+                    else:
+                        st.session_state.erros += 1
+                        st.session_state.tentativa = 1
+                        st.session_state.mostrar_resposta = True
+
+    else:
+        st.session_state.pagina = "resultado"
+        st.rerun()
+
+# -------- RESULTADO --------
+elif st.session_state.pagina == "resultado":
+    st.title("🏁 Resultado Final")
+
+    st.write(f"👤 Jogador: {st.session_state.nome}")
+    st.write(f"Pontuação: {st.session_state.pontuacao} / {st.session_state.total}")
+    st.write(f"Erros: {st.session_state.erros}")
+
+    if st.button("Reiniciar"):
+        st.session_state.clear()
         st.rerun()
